@@ -1,0 +1,31 @@
+# Gate check G1-G8 - Saarthi Kavach (2026-11-22)
+
+Target: ASVS 5.0.0 L1 (demo scope). Requirement ids checked: V1.2 (output encoding / injection), V2.2 (input validation), V4.1 (access control on state-changing routes), V7.x (log/secret hygiene), V13.3 (secrets management), V14.2 (sensitive data in repo/artefacts). Checked against the local repo only, offline build (adapters stubbed), nothing pushed. `py -3.12 -m pytest -q`: 101 passed.
+Live run: `APP_PASSCODE=t PACING_SPEED=0 ... uvicorn app.main:app --port 8796`; process killed afterwards (health check on :8796 fails, confirmed).
+
+| Gate | Status | Evidence |
+|---|---|---|
+| G1 synthetic phones | CLOSED | Live `fake_kyc` runs: `/api/state` had 0 naked phones, 11 "(synthetic)" suffixes. SQLite drafts table: 4 drafts (bank_alert + helpline_1930, 2 runs), each body has the suffix, 0 naked 10-digit numbers. Tests `test_g1_every_draft_phone_has_suffix`, `test_g1_no_naked_phone_in_any_emitted_event`, `test_g1_fixture_glosses_and_cue_cards_tagged` (tests/test_gates.py). No `.txt` export route exists in the app (api.py), so the export clause is N/A; the C9 watermark is on the drafts (`test_draft_hash_and_watermark`). Dashboard DOM not eyeballed in a browser (state payload only). |
+| G2 TTS vendor | N/A-until-keys | `TTS_PROVIDER` unset; `.env.example:37-38` has voice-id vars. README does not yet list the pinned catalog voice ids or the "no cloning/voice design" rule. |
+| G3 AdaL containment | CLOSED in code and tests; real AdaL N/A-until-keys | `test_proxy_refuses_other_hosts_and_ports_allows_model_host` (evil host, wrong port, 127.0.0.1:22 all 403) and `test_proxy_denies_non_connect_and_empty_allowlist`. `test_adal_exit_2_aborts_and_template_is_used`. No `--yolo` anywhere (`grep yolo app`). reporter.py:163 builds env as PATH + ADAL_PROVIDER_KEY (+ HTTPS_PROXY); empty temp cwd (reporter.py:154). No Dockerfile or `.env` in the repo, so "no .env in image" holds trivially. Gaps: see F1, F2. |
+| G4 PTT notice | CLOSED | web/dashboard.html:54 shows the exact notice; cue card at :55; only text is stored. Volunteer rule is procedural. |
+| G5 PTT injection | CLOSED for typed/offline; re-run with keys and by voice | Live: `POST /api/ptt` no passcode = 401; 501 chars = 422 (`PttBody` max_length=500, contracts.py:123); orchestrator also slices `[:500]` (orchestrator.py:95,182). Injected cases 1-3 and the `<img onerror>` payload (case 4) accepted as `human_stt` turns; Kamla replies were canned, no state change. Case 2's UPI `ignore.rules@ok` became an entity with status `suspect`, not `verified`; draft count unchanged (4). `c2_filter` direct: "OTP 482913 / pin 4455" and a non-planted account both replaced with the safe line (2 redactions). Tests `test_ptt_cap_auth_and_flow`, `test_ptt_prompt_injection_is_just_data`, `test_c2_blocks_real_looking_numbers_and_secrets`. Limit: offline Kamla is canned, so LLM-level resistance and the Chrome voice path are untested until sponsor keys. |
+| G6 keys and retention | CLOSED (repo); rotation N/A-until-keys | gitleaks 8.30.1: `gitleaks git .` (9 commits) no leaks; `gitleaks dir .` no leaks. Regex grep (sk-, AKIA, ghp_, xox, Bearer, private key, api_key literals): 0 hits. `.gitignore` excludes `.env`, `.env.*`, `data/`, `audio/cache/`; `git ls-files` has no env/db/log. `.env.example` key lines empty (`test_g6_no_secrets_in_code_or_env_example`). 2026-12-05 deletion list is a calendar item, not code. |
+| G7 Band and internal API | CLOSED | `extract_job_id` run on 9 hostile strings (suffix text, prefix text, trailing `\n@evil`, uppercase hex, path traversal, zero-width char, embedded mention): only the exact sentence returns a job id (trailing newline is stripped, harmless). `ReporterBand.on_mention` returns None for a non-existent job; `run_job` re-shows existing drafts only (reporter.py:~198). Tests `test_handoff_regex_rejects_everything_but_the_sentence`, `test_forged_mention_cannot_create_or_rerun`, `test_band_event_in_run_is_job_id_only_handoff_and_mirrored_false`. `/api/internal/report-jobs/{id}` without token = 401 (live). Gap: F3. |
+| G8 public mirror | OPEN | No mirror script, no gitleaks config or CI hook in the repo (tools/ has only preflight.py and run10.py). `prompts/*.md` and `fixtures/synthetic.sample.json` are tracked, so a plain public push would leak them. Not blocking the recording unless a public repo is required. |
+| C5 no innerHTML | CLOSED | `grep -rnE "innerHTML|outerHTML|insertAdjacentHTML|document.write|eval\(" web/` = 0 hits; `test_web_uses_no_innerhtml`; only DOM sink is `audio.src` from the server queue (dashboard.js:166). Live `<img src=x onerror=alert(1)>` went through the PTT path as data; CSP is `script-src 'self'` (api.py). |
+
+## Required fixes (do not change code here; owners and one-liners)
+
+| # | Owner | Fix |
+|---|---|---|
+| F1 | backend | In `Reporter._adal_narrative`, return None (use template) when `ADAL_ALLOWED_HOST` is empty, so AdaL never runs without the egress proxy (G3). |
+| F2 | backend | Update `test_adal_exit_2...` env assertion to allow `HTTPS_PROXY`/`https_proxy`, and add a test with `adal_allowed_host` set; the proxy is advisory, so run spike S5 before enabling real AdaL and keep Finch skill out of AdaL if it ignores it. |
+| F3 | backend | Reject startup when `INTERNAL_TOKEN` is set but shorter than 32 bytes (config.py:105); optionally bind to 127.0.0.1 only (README should show `--host 127.0.0.1`). |
+| F4 | backend | README: list the pinned TTS catalog voice ids and state "no cloning or voice design" (G2). |
+| F5 | frontend | Pass PTT human text through `tag_phones` before rendering in the turn feed so a volunteer-spoken number cannot appear without the suffix (G1 hardening, low). |
+| F6 | backend (B) | Before any public push: add an internal document (not shipped) that excludes `prompts/`, scam beats in `fixtures/`, `.env*`, `data/`, `audio/`, runs `gitleaks dir` on the mirror, and fails on a hit (G8). |
+
+## Open questions
+- Will the dashboard URL be public during judging? If yes, passcode (C7) is already enforced on start/PTT/approve/kill, but `/api/state` and `/api/events` are unauthenticated read.
+- Team lead waiver for Chrome/Google speech (ruling 4) is still needed before volunteers use PTT.

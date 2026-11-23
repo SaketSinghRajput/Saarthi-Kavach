@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Saarthi Kavach - Command Centre</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="jarvis.css">
+</head>
+<body class="jv">
+<a class="skip" href="#pn-drafts">Skip to drafts</a>
+<div class="stage" id="stage">
+
+<header class="top">
+  <h1 class="logo">Saarthi Kavach<small>Scam-call decoy command centre</small></h1>
+  <label class="sel"><b>Scenario</b>
+    <select id="scenario">
+      <option value="digital_arrest">Digital arrest (fake CBI / police), Hinglish</option>
+      <option value="fake_kyc">Fake KYC / bank officer, Hinglish</option>
+      <option value="fake_investment">Fake investment / trading tips, Hinglish</option>
+    </select></label>
+  <label class="sel w250"><b>Scammer input</b>
+    <select id="inputMode">
+      <option value="scripted">Scripted scammer</option>
+      <option value="ptt">Typed push-to-talk</option>
+    </select></label>
+  <button class="btn call" id="btnCall">Call</button>
+  <button class="btn end" id="btnEnd">End</button>
+  <div class="live" id="live"><i></i><span id="liveTxt" role="status" aria-live="polite">IDLE 00:00</span></div>
+  <div class="sp"></div>
+  <button class="techbtn" id="techBtn" type="button" aria-pressed="true">Technical details: <b id="techState">ON</b></button>
+  <div class="mockbadge" id="mockBadge" hidden>MOCK REPLAY</div>
+  <div class="sim">SIMULATED DEMO<br>ALL DATA SYNTHETIC</div>
+</header>
+
+<p class="who" id="who"><span lang="en">Run by <b>bank fraud desks</b> &middot; <b>1930 cyber cells</b> &middot; <b>telecom anti-fraud teams</b>. Citizens never touch this console. <a class="cl" href="/citizen.html">Citizen page &rarr;</a></span></p>
+
+<!-- citizen outcome: appears once the detector flags a scam -->
+<aside class="citizen" id="citizen" role="alert" hidden>
+  <div class="cz-tag">What the citizen is told <span id="czType"></span></div>
+  <div class="cz-body">
+    <div class="cz-hi">
+      <div class="cz-l1" lang="hi">यह फ्रॉड है। पैसे मत भेजिए, कॉल काटिए, 1930 पर कॉल कीजिए।</div>
+      <div class="cz-l2" lang="hi-Latn">Yeh fraud hai &mdash; paise mat bhejiye, call kaatiye, 1930 par call kijiye</div>
+    </div>
+    <div class="cz-en" lang="en">This is a scam &mdash; don&rsquo;t pay, hang up, call <b>1930</b></div>
+    <a class="cz-n" href="tel:1930" aria-label="Call 1930 cyber crime helpline"><span aria-hidden="true">📞</span> Call 1930</a>
+  </div>
+</aside>
+<div class="cz-wait" id="czWait" role="status">Listening to the call&hellip; a warning will appear here if it&rsquo;s a scam.</div>
+
+<!-- sponsor / agent status rail -->
+<nav class="rail tech" id="rail" aria-label="Sponsor agents">
+  <div class="chips" id="railChips"></div>
+  <div class="lanes">
+    <div><b>Voice Agent:</b> Kamla ji (Lyzr)</div>
+    <div><b>Action Agents:</b> Detector &middot; Intel &middot; Verifier &middot; Reporter &middot; Scout</div>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- 1: CALL -->
+<section class="col" id="col1">
+  <div class="panel f1" id="pn-call">
+    <h2><span><span class="num">1</span>Call</span><span class="tag sp1" id="callTag">Kamla ji, 68 &bull; Hinglish</span></h2>
+    <div class="orbrow jv-only">
+      <canvas id="orb" width="132" height="132"></canvas>
+      <div class="orbtxt"><div class="orbwho" id="orbWho">IDLE</div><div class="orbsub" id="orbSub">Press Call to start</div></div>
+    </div>
+    <div class="tr scroll" id="tr" aria-live="polite" aria-label="Call transcript" tabindex="0"></div>
+  </div>
+  <div class="panel" id="pn-ptt">
+    <h2><span><span class="num">1</span>Typed push-to-talk</span><span class="tag" id="pttTag">typed input</span></h2>
+    <div class="ptt">
+      <button class="mic" id="mic" type="button" hidden>Tap to talk</button>
+      <div class="pttr">
+        <label class="lbl" for="pttText">What the scammer says (typed)</label>
+        <textarea id="pttText" maxlength="500" placeholder="Type what the scammer says (cue-card details only)"></textarea>
+        <div class="pttrow">
+          <label class="lbl in" for="pttLang">Language</label>
+          <select id="pttLang"><option value="hi-IN">Hindi (hi-IN)</option><option value="en-IN">English (en-IN)</option></select>
+          <button class="btn" id="pttSend" type="button">Send</button>
+          <span class="cnt" id="pttCnt">0/500</span>
+        </div>
+        <div class="pmsg" id="pttMsg" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+    <p class="notice" id="pttNotice">Typed push-to-talk: you type the scammer&rsquo;s words. Voice input is off. Use cue-card details only; no real personal information.</p>
+    <p class="cue">Cue card: "Main CBI se bol raha hoon. Paise UPI officer.rathore.cbi@demobank pe bhejiye."</p>
+  </div>
+</section>
+
+<!-- 2: INTEL -->
+<section class="col" id="col2">
+  <div class="panel" id="pn-hero">
+    <div class="hero">
+      <div class="big">
+        <div class="n" id="wasted">00:00</div>
+        <div class="l" title="Scripted call timer, not an outcome. Simulated call.">scammer time engaged (simulated call)<small class="sub">scripted call timer, not an outcome</small></div>
+      </div>
+      <div class="kv">
+        <div title="Silence between the caller finishing and Kamla's first sound (filler or reply), 95th percentile. Budget 1.5 s." aria-label="Dead air: silence between the caller finishing and Kamla's first sound (filler or reply), 95th percentile"><span id="mL1">Dead air p95</span> <b id="mP95">-</b> <span>&middot; budget 1.5 s</span> <b id="mBudT">-</b></div>
+        <div id="mAns" title="Time from the caller finishing to Kamla's real (substantive) reply starting, including model compute, 95th percentile." aria-label="Kamla answer: time from the caller finishing to Kamla's substantive reply starting, 95th percentile"><span id="mAnsL">Kamla answer p95</span> <b id="mAnsV">-</b> <span id="mAnsS"></span></div>
+        <div title="Share of Kamla turns that began with a short filler (e.g. 'haan ji') to cover thinking time." aria-label="Filler rate: share of Kamla turns that began with a short filler to cover thinking time">Filler rate <b id="mFill">-</b></div>
+        <div title="Number of caller-and-Kamla exchanges completed so far in this call." aria-label="Turns: number of caller and Kamla exchanges completed so far"><span>Turns</span> <b id="mTurns">-</b></div>
+        <div class="kvn nn" id="mN" title="Sample size behind the p95 figures above"></div>
+        <div class="kvn" id="mNote" hidden></div>
+        <div class="kvn" id="mImp" hidden></div>
+      </div>
+    </div>
+  </div>
+  <div class="deep" id="deep">
+    <div class="ic" id="deepIc">&#10003;</div>
+    <div><small id="deepHd">Caller voice check (DetectifAI, not a sponsor)</small><b id="deepT">caller voice: no synthetic voice flagged</b><span id="deepS">Detector listening</span></div>
+    <div class="wave" id="wave"></div>
+  </div>
+  <div class="panel" id="pn-risk">
+    <h2><span><span class="num">2</span>Scam type &amp; risk</span><span class="tag">Detector</span></h2>
+    <div class="riskrow">
+      <svg id="dial" class="jv-only" width="160" height="125" viewBox="0 0 160 125" aria-hidden="true"></svg>
+      <div class="rtxt">
+        <div class="risk" id="riskT" aria-live="polite">Waiting for call</div>
+        <div class="stage-l" id="riskS">Stage: -</div>
+        <div class="bar"><i id="riskM"></i></div>
+        <div class="mrow"><span>Low</span><span>Medium</span><span>High</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel f1" id="pn-ents">
+    <h2><span><span class="num">2</span>Extracted entities <span class="more" id="more"></span></span>
+      <span class="flow"><b class="fh">heard</b>&rarr;<b class="fs">suspect</b>&rarr;<b class="fc">confirmed</b></span></h2>
+    <div class="ents" id="ents"></div>
+  </div>
+</section>
+
+<!-- 3: AGENTS & REPORTS -->
+<section class="col" id="col3">
+  <div class="panel f105" id="pn-band">
+    <h2><span><span class="num">3</span>Agents &amp; Reports: Band room</span><span class="tag sp1">Band</span></h2>
+    <svg id="agraph" class="jv-only tech" role="img" viewBox="0 0 526 98" width="526" height="98" aria-label="Agent activity graph: Saarthi, Detector, Intel, Verifier, Reporter and Skill Scout passing messages"></svg>
+    <div class="room scroll" id="room" aria-live="polite" aria-label="Agent room messages" tabindex="0"></div>
+    <div class="finch tech" id="finch" hidden></div>
+    <div class="policy tech" id="policy"></div>
+  </div>
+  <div class="panel f1" id="pn-drafts" tabindex="-1">
+    <h2><span><span class="num">3</span>Draft reports</span><span class="tag" id="draftTag">Reporter</span></h2>
+    <div class="dwrap">
+      <div class="drafts" id="drafts" tabindex="0" role="region" aria-label="Draft reports"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<aside class="cz-end">Never pay on a call &mdash; Hang up &mdash; <a href="tel:1930" aria-label="Call 1930 cyber crime helpline">Call 1930</a></aside>
+
+<footer class="foot tech" id="strip" aria-label="Agent handoff timeline">
+  <div class="hl-t">Handoff<br>timeline</div>
+  <div class="hs" id="hs"></div>
+  <div class="hnote">Demo &bull; synthetic<br>DetectifAI: not a sponsor</div>
+</footer>
+
+</div>
+<dialog id="dlg" aria-labelledby="dlgT">
+  <div class="dlghead"><h2 id="dlgT">Draft</h2><button class="btn" id="dlgX" type="button">Close</button></div>
+  <div class="dlgbody" id="dlgBody" tabindex="0"></div>
+</dialog>
+<script src="mock.js"></script>
+<script src="jarvis.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

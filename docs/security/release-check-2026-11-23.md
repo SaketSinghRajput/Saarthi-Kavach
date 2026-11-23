@@ -1,0 +1,22 @@
+# Release security check - Saarthi Kavach public mirror + Agent37 demo (2026-11-23)
+
+Target: ASVS 5.0.0 L1. Ids checked: V1.2, V4.1/V4.2 (access control on state-changing and read routes), V13.3 (secrets), V14.2 (artefacts), V12.x (egress), V16.x (log hygiene). Scope: `4dfa79f..HEAD` (6 commits). `.env` not read. No paid calls. `py -3.12 -m pytest -q`: 156 passed. No code changed.
+
+| # | Item | Result | Evidence |
+|---|---|---|---|
+| 1 | Dockerfile / .dockerignore | PASS | `docker build` ok; container (`--network none`): uid 10001 non-root; /opt/saarthi holds app, audio, data (empty), fixtures, web only; no .env*, *.db, real-test, prompts, tests; env names contain no secrets (GPG_KEY is the public Python release fingerprint); regex over app/web/fixtures: 0 hits. Image removed. |
+| 2 | deploy/agent37_deploy.py | PASS (1 should-fix) | Key sent only as Bearer to api.agent37.com; presigned upload gets no key; dry-run redacts every env value; real run exits without APP_PASSCODE and without key; teardown deletes instance (+template on flag); state file gitignored, id only. S1: PASS_THROUGH forwards unneeded secrets (INTERNAL_TOKEN, ADAL_PROVIDER_KEY, DETECTIFAI_API_KEY; AdaL CLI is not in the image). Trim to what the hosted demo needs; unset vars are skipped anyway, so only matters if they are in the deployer's env. |
+| 3 | Public exposure | PASS (1 should-fix) | With APP_PASSCODE: call start, PTT, kill, approve all need passcode (header; start/approve also body); `/api/state` and `/api/events` need it (header or `?pc=`); start also rate-limited (`START_RATE_PER_MIN`) and one call at a time. Anonymous visitors cannot burn Lyzr/AdaL credits. Open without passcode: `/api/health` (live/stub booleans, active flag), `/audio/*` (pre-rendered synthetic clips, content-hashed names), static web, `/api/docs` + `/api/openapi.json`. S2: disable docs/openapi in the hosted image (low, route map only). S3: SSE passcode in URL; uvicorn access log is scrubbed by `_ScrubPc`, but share the demo link without `?pc=`. |
+| 4 | agent_status / /api/state | PASS | `agent_status()` returns only platform names and "live"/"stub" strings; no key, URL or id fragments (orchestrator.py). `host` flag is a boolean of agent37_url/instance. |
+| 5 | Finch scout | PASS | Egress allow-list unchanged: https only, host set, redirects off (egress.py); scout total budget 4s. Response fields coerced via `_clean` (str, length-capped 60/80/40/100). Web: `grep innerHTML/outerHTML/insertAdjacentHTML/document.write/eval` over web/ = 0 hits; skill names flow to the DOM through createElement/textContent paths; only sink is `audio.src` from the server queue. Read-only, web/ not touched. Residual: Finch names appear in draft bodies unfiltered by c2 (see S4). |
+| 6 | Band / Reporter (G7) | PASS | Band text is code-built (`tag_phones`, 400-char cap); handoff asserted `extract_job_id(text)==job_id`; `band_msg_id` is parsed leniently, type-checked (str/int, not bool) and truncated to 80 chars; skills line uses names from the code-built `skill` event, not transcript. S4: run `c2_filter`-style scrub on Finch names before they enter drafts (names are third-party text, 60 chars max). |
+| 7 | Secret scan | PASS | gitleaks 8.30.1 on a copy of the working tree (tracked + untracked non-ignored, .env excluded): no leaks (744 KB). `gitleaks git --log-opts=4dfa79f..HEAD`: 6 commits, no leaks. Regex sweep (sk-, AKIA, ghp_, xox, private key) of tree and added history lines: 0 hits. `git ls-files` has no .env/db/state file. |
+
+## Must-fix
+None.
+
+## Should-fix (not blocking)
+S1 trim deploy PASS_THROUGH; S2 turn off /api/docs and /api/openapi.json when passcode is set; S3 share URL without `?pc=`; S4 scrub Finch names in drafts. G8 (public mirror) still needs an internal document (not shipped) run with exclusion of `prompts/`, scam beats in `fixtures/synthetic.sample.json`, `.env*`, `data/`, `audio/`, then `gitleaks dir` on the mirror before push; I have not reviewed the mirror itself. Note the hosted image does ship `fixtures/` (needed at runtime) and 33 MB of synthetic TTS clips: acceptable for the demo, not for the public repo.
+
+## Verdict: GO with conditions
+Conditions: (a) deploy only with a strong APP_PASSCODE set and keep INTERNAL_TOKEN/ADAL/DetectifAI vars out of the deployer env; (b) run the mirror exclusion list and `gitleaks dir` on the mirror before the public push and send me the file list for review; (c) rotate the Agent37 and sponsor keys after judging and delete the instance (`--teardown`).

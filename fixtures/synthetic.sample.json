@@ -1,0 +1,970 @@
+{
+  "_comment": "SANITISED SAMPLE for the public mirror. ALL DATA IS SYNTHETIC. Fictional names, fictional bank codes (DEMO/DEMX/DEMY), fake accounts (000000xxxxxx), UPI handle @kavachtest, phones 9000000001-9000000009 (always shown with '(synthetic)'). Nothing here is a real person, account or number. Scam beats are generic outlines only; the full script set is withheld.",
+  "version": 1,
+  "persona": {
+    "name": "Kamla ji",
+    "age": 68,
+    "city": "Nowhereville (fictional)",
+    "style": "Elderly, trusting, slow, chatty Hinglish. Never gives real details. Stalls and asks the caller to repeat, always steering the caller to say payment details slowly."
+  },
+  "synthetic_phone_range": [
+    "9000000001",
+    "9000000009"
+  ],
+  "upi_handles": [
+    "okaxis",
+    "okhdfcbank",
+    "oksbi",
+    "ybl",
+    "paytm",
+    "upi",
+    "ibl",
+    "axl",
+    "kavachtest"
+  ],
+  "target_labels": {
+    "upi": {
+      "hi": "UPI ID",
+      "en": "UPI ID"
+    },
+    "bank_account": {
+      "hi": "account number",
+      "en": "account number"
+    },
+    "ifsc": {
+      "hi": "IFSC code",
+      "en": "IFSC code"
+    },
+    "phone": {
+      "hi": "phone number",
+      "en": "phone number"
+    }
+  },
+  "ifsc_banks": {
+    "DEMO": {
+      "bank": "Kavach Demo Bank (fictional)",
+      "branch": "Nowhere Main Branch (fictional)"
+    },
+    "DEMX": {
+      "bank": "Saarthi Sample Co-operative Bank (fictional)",
+      "branch": "Sample Road Branch (fictional)"
+    },
+    "DEMY": {
+      "bank": "Fictional Gramin Bank",
+      "branch": "Imaginary Village Branch (fictional)"
+    }
+  },
+  "detector_lexicon": {
+    "category_weights": {
+      "hook": 0.08,
+      "authority": 0.15,
+      "urgency": 0.15,
+      "payment_ask": 0.2,
+      "pressure": 0.1
+    },
+    "weak_words": [
+      "account",
+      "pay",
+      "payment",
+      "link",
+      "download",
+      "deposit",
+      "transfer",
+      "pin",
+      "commission",
+      "demanded",
+      "withdrawal",
+      "advisor",
+      "group",
+      "whatsapp",
+      "telegram",
+      "bill",
+      "refund",
+      "pending",
+      "bank",
+      "task",
+      "returns",
+      "profit"
+    ],
+    "weak_factor": 0.4,
+    "advisory_markers": [
+      "never share",
+      "do not share your",
+      "don't share your",
+      "will never ask",
+      "will not ask",
+      "never ask",
+      "beware of",
+      "be alert",
+      "stay alert",
+      "hang up and call",
+      "awareness",
+      "advisory",
+      "be careful"
+    ],
+    "corroboration": {
+      "per_point": 0.04,
+      "free_points": 2,
+      "cap": 0.2,
+      "advisory_cap": 0.45
+    },
+    "categories": {
+      "hook": [
+        "parcel",
+        "courier",
+        "kyc",
+        "aadhaar",
+        "aadhar",
+        "sim card",
+        "profit",
+        "invest",
+        "investment",
+        "trading",
+        "guaranteed",
+        "group",
+        "customer care",
+        "pending",
+        "customs",
+        "drugs",
+        "illegal",
+        "money laundering",
+        "fraudulent",
+        "suspicious activity",
+        "identity",
+        "stolen",
+        "credit card",
+        "debit card",
+        "electricity",
+        "power supply",
+        "bill",
+        "expired",
+        "expire",
+        "expiry",
+        "task",
+        "part-time job",
+        "returns",
+        "bonus",
+        "refund",
+        "video call",
+        "whatsapp",
+        "telegram",
+        "bijli",
+        "parsal",
+        "aadhaar ka galat",
+        "आधार",
+        "पार्सल",
+        "बिजली",
+        "बिल",
+        "केवाईसी",
+        "वीडियो कॉल",
+        "अकाउंट",
+        "खाता",
+        "बैंक",
+        "stock tips",
+        "ipo",
+        "high returns",
+        "trading app",
+        "withdrawal",
+        "advisor",
+        "frozen",
+        "vigilance"
+      ],
+      "authority": [
+        "cbi",
+        "police",
+        "rbi",
+        "officer",
+        "inspector",
+        "constable",
+        "customs",
+        "narcotics",
+        "sebi",
+        "cyber cell",
+        "cyber crime",
+        "cybercrime",
+        "bank manager",
+        "reserve bank",
+        "telecom authority",
+        "trai",
+        "department of telecom",
+        "enforcement directorate",
+        "supreme court",
+        "magistrate",
+        "court",
+        "fir",
+        "crime branch",
+        "ncb",
+        "income tax",
+        "पुलिस",
+        "सीबीआई",
+        "आरबीआई",
+        "अधिकारी",
+        "साइबर क्राइम",
+        "कस्टम",
+        "federal investigation",
+        "investigation agency",
+        "law enforcement",
+        "vigilance",
+        "bank official",
+        "bank officials",
+        "bank executive",
+        "tax department",
+        "cyber police"
+      ],
+      "urgency": [
+        "abhi",
+        "turant",
+        "warrant",
+        "arrest",
+        "arrested",
+        "ghante",
+        "aaj hi",
+        "aaj raat",
+        "block",
+        "blocked",
+        "band ho",
+        "last din",
+        "digital arrest",
+        "tonight",
+        "immediately",
+        "right now",
+        "within two hours",
+        "within 2 hours",
+        "two hours",
+        "2 hours",
+        "24 hours",
+        "will be cut",
+        "will be disconnected",
+        "will be blocked",
+        "will be suspended",
+        "disconnected",
+        "suspended",
+        "deactivated",
+        "do not disconnect",
+        "do not hang up",
+        "keep the call",
+        "stay on the call",
+        "stay on the video call",
+        "throughout the night",
+        "do not tell anyone",
+        "don't tell anyone",
+        "tell no one",
+        "kisi ko mat batana",
+        "kat jayega",
+        "kat jaayega",
+        "giraftar",
+        "gireftar",
+        "गिरफ्तार",
+        "वारंट",
+        "आज रात",
+        "तुरंत",
+        "कनेक्शन कट",
+        "किसी को मत बताना",
+        "बंद हो",
+        "account will be blocked",
+        "account will be suspended",
+        "ब्लॉक हो",
+        "account block",
+        "kuch hi second",
+        "freeze",
+        "frozen",
+        "imprisonment",
+        "legal action",
+        "custody",
+        "threatened",
+        "deadline",
+        "charged",
+        "implicated",
+        "stay in place",
+        "jail"
+      ],
+      "payment_ask": [
+        "upi",
+        "account",
+        "ifsc",
+        "transfer",
+        "bhejo",
+        "bhejna",
+        "pay",
+        "deposit",
+        "number deta",
+        "details deta",
+        "card number",
+        "card details",
+        "cvv",
+        "otp",
+        "pin",
+        "security deposit",
+        "processing fee",
+        "verification fee",
+        "bank details",
+        "send money",
+        "anydesk",
+        "teamviewer",
+        "apk",
+        "click the link",
+        "press 9",
+        "press 1",
+        "paise bhejo",
+        "पैसे",
+        "ओटीपी",
+        "passcode",
+        "one-time passcode",
+        "liquidate",
+        "redeem",
+        "tax payment",
+        "download",
+        "mobile application",
+        "install the app",
+        "demanded",
+        "payment",
+        "link",
+        "commission",
+        "withdrawal fee",
+        "share the otp",
+        "share that"
+      ],
+      "pressure": [
+        "jaldi",
+        "time bahut kam",
+        "kitni der",
+        "der mat",
+        "phir se bol",
+        "hurry",
+        "do it now",
+        "last warning",
+        "don't delay",
+        "do not delay"
+      ]
+    },
+    "scam_types_strong": {
+      "digital_arrest": [
+        "cbi",
+        "digital arrest",
+        "narcotics",
+        "warrant",
+        "money laundering",
+        "cyber crime",
+        "cybercrime",
+        "enforcement directorate",
+        "trai",
+        "telecom authority",
+        "number will be blocked",
+        "stay on the video call",
+        "do not tell anyone",
+        "don't tell anyone",
+        "kisi ko mat batana",
+        "सीबीआई",
+        "गिरफ्तार",
+        "किसी को मत बताना",
+        "federal investigation",
+        "investigation agency",
+        "law enforcement",
+        "custody",
+        "imprisonment"
+      ],
+      "fake_kyc": [
+        "kyc",
+        "केवाईसी",
+        "electricity",
+        "power supply",
+        "bijli",
+        "बिजली",
+        "reserve bank",
+        "rbi",
+        "customer care",
+        "power will be cut",
+        "connection will be cut",
+        "one-time passcode",
+        "passcode",
+        "freeze",
+        "frozen",
+        "identity records"
+      ],
+      "fake_investment": [
+        "guaranteed profit",
+        "guaranteed returns",
+        "trading group",
+        "investment group",
+        "part-time job",
+        "task",
+        "double your money",
+        "sebi",
+        "high returns",
+        "trading app",
+        "stock tips",
+        "ipo",
+        "investment advisor",
+        "withdrawal fee",
+        "tax payment"
+      ]
+    },
+    "scam_types": {
+      "digital_arrest": [
+        "arrest",
+        "police",
+        "parcel",
+        "customs",
+        "courier",
+        "fedex",
+        "dhl",
+        "fir",
+        "aadhaar",
+        "aadhar",
+        "sim card",
+        "illegal",
+        "drugs",
+        "identity",
+        "stolen",
+        "court",
+        "investigation",
+        "video call",
+        "isolate",
+        "custody",
+        "officer",
+        "inspector",
+        "constable",
+        "cyber cell",
+        "fraudulent",
+        "press 9",
+        "giraftar",
+        "parsal",
+        "पार्सल",
+        "आधार",
+        "पुलिस",
+        "throughout the night",
+        "keep the call",
+        "stay on the call",
+        "do not disconnect",
+        "implicated",
+        "vigilance",
+        "charged",
+        "legal action",
+        "stay in place",
+        "jail"
+      ],
+      "fake_kyc": [
+        "update",
+        "block",
+        "blocked",
+        "verification",
+        "bill",
+        "expire",
+        "expired",
+        "expiry",
+        "debit card",
+        "credit card",
+        "disconnected",
+        "will be cut",
+        "net banking",
+        "pan card",
+        "meter",
+        "customer",
+        "bank account",
+        "khata",
+        "connection",
+        "बिल",
+        "बंद",
+        "ब्लॉक",
+        "अकाउंट",
+        "खाता",
+        "बैंक",
+        "account will be blocked",
+        "account block",
+        "freeze",
+        "frozen",
+        "link",
+        "deadline",
+        "account will",
+        "identity"
+      ],
+      "fake_investment": [
+        "profit",
+        "invest",
+        "investment",
+        "trading",
+        "guaranteed",
+        "group",
+        "double",
+        "returns",
+        "bonus",
+        "telegram",
+        "whatsapp",
+        "earn",
+        "commission",
+        "stock",
+        "ipo",
+        "stock tips",
+        "trading app",
+        "withdrawal",
+        "advisor",
+        "gains",
+        "allotment",
+        "high returns",
+        "admin",
+        "stocks"
+      ]
+    }
+  },
+  "tactics": {
+    "NEUTRAL": [
+      {
+        "tactic_id": "who_is_this",
+        "text": "Ask who is calling and why, politely and confused."
+      }
+    ],
+    "STALL": [
+      {
+        "tactic_id": "slow_listener",
+        "text": "Act confused and slow, ask what exactly you must do, pull the caller towards payment."
+      },
+      {
+        "tactic_id": "scared_but_willing",
+        "text": "Sound scared but willing, ask the caller to explain the steps one by one."
+      }
+    ],
+    "ASK": [
+      {
+        "tactic_id": "ask_writing",
+        "text": "Say you are writing it down, ask for the {target_label}, slowly."
+      },
+      {
+        "tactic_id": "ask_pen",
+        "text": "Say you picked up a pen, ask again for the {target_label}."
+      },
+      {
+        "tactic_id": "ask_son",
+        "text": "Say your son will do the payment, ask for the {target_label}."
+      }
+    ],
+    "REPEAT": [
+      {
+        "tactic_id": "repeat_slow",
+        "text": "Say the line was bad, ask them to repeat the {target_label} slowly."
+      }
+    ],
+    "READ_BACK": [
+      {
+        "tactic_id": "readback",
+        "text": "Rendered by code from the read-back template."
+      }
+    ],
+    "METHOD_FAILED": [
+      {
+        "tactic_id": "app_failed",
+        "text": "Say your payment app failed, ask for the {target_label} to pay another way."
+      }
+    ],
+    "WRAP_UP": [
+      {
+        "tactic_id": "wrap",
+        "text": "End the call politely, someone is at the door."
+      }
+    ]
+  },
+  "canned": {
+    "NEUTRAL": [
+      {
+        "text": "Hello? Kaun bol raha hai beta? Aap kis liye phone kar rahe ho?",
+        "gloss_en": "Hello? Who is speaking, dear? Why are you calling?"
+      },
+      {
+        "text": "Haan ji, namaste. Aap kaun, aur kya kaam hai?",
+        "gloss_en": "Yes, hello. Who are you and what is this about?"
+      }
+    ],
+    "STALL": [
+      {
+        "text": "Arre beta, ruko zara, mera chashma nahi mil raha... haan, ab batao, mujhe kya karna hai?",
+        "gloss_en": "Oh dear, wait, I can't find my glasses... okay, now tell me, what must I do?"
+      },
+      {
+        "text": "Oh ho, main ghabra gayi. Dheere dheere samjhao, kya karna padega?",
+        "gloss_en": "Oh no, I'm scared. Explain slowly, what will I have to do?"
+      }
+    ],
+    "ASK": [
+      {
+        "text": "Theek hai beta, main likh rahi hoon. Aapka {target_label} kya hai? Dheere dheere bolo.",
+        "gloss_en": "Okay dear, I'm writing. What is your {target_label_en}? Say it slowly."
+      },
+      {
+        "text": "Haan haan, pen utha liya. {target_label} phir se batao na.",
+        "gloss_en": "Yes yes, I picked up the pen. Tell me the {target_label_en} again."
+      },
+      {
+        "text": "Mera beta paise bhej dega, bas {target_label} bata do.",
+        "gloss_en": "My son will send the money, just tell me the {target_label_en}."
+      }
+    ],
+    "REPEAT": [
+      {
+        "text": "Arre, sunayi nahi diya beta. {target_label} ek baar phir se bolo, thoda dheere.",
+        "gloss_en": "Oh, I couldn't hear, dear. Say the {target_label_en} once more, a bit slower."
+      },
+      {
+        "text": "Line kharab hai, {target_label} dobara bolo na, main likh rahi hoon.",
+        "gloss_en": "The line is bad, say the {target_label_en} again, I'm writing."
+      }
+    ],
+    "METHOD_FAILED": [
+      {
+        "text": "Beta, mere phone par woh app nahi chal raha. Koi aur tareeka? {target_label} seedha bata do.",
+        "gloss_en": "Dear, that app isn't working on my phone. Another way? Just tell me the {target_label_en}."
+      },
+      {
+        "text": "App mein error aa raha hai beta, {target_label} bata do, main bank jaake kar dungi.",
+        "gloss_en": "The app shows an error, tell me the {target_label_en}, I'll go to the bank."
+      }
+    ],
+    "WRAP_UP": [
+      {
+        "text": "Beta, mera beta ghar aa gaya hai, main baad mein baat karti hoon. Namaste.",
+        "gloss_en": "Dear, my son has come home, I'll talk later. Goodbye."
+      },
+      {
+        "text": "Doorbell baj rahi hai beta, abhi rakhti hoon.",
+        "gloss_en": "The doorbell is ringing, dear, I'm hanging up now."
+      }
+    ]
+  },
+  "readback_templates": [
+    {
+      "text": "Ruko beta, likh rahi hoon... {spoken}... sahi hai na?",
+      "gloss_en": "Wait dear, I'm writing... {value}... that's right, no?"
+    },
+    {
+      "text": "Achha, main padhti hoon: {spoken}. Theek hai na beta?",
+      "gloss_en": "Okay, let me read it out: {value}. Correct, dear?"
+    }
+  ],
+  "digit_words_hi": [
+    "shunya",
+    "ek",
+    "do",
+    "teen",
+    "char",
+    "paanch",
+    "chhe",
+    "saat",
+    "aath",
+    "nau"
+  ],
+  "fillers": [
+    {
+      "text": "Haan beta... ek minute...",
+      "gloss_en": "Yes dear... one minute..."
+    },
+    {
+      "text": "Hmm, ruko zara...",
+      "gloss_en": "Hmm, wait a moment..."
+    },
+    {
+      "text": "Arre, kya bol rahe the?",
+      "gloss_en": "Oh, what were you saying?"
+    },
+    {
+      "text": "Achha achha... hmm...",
+      "gloss_en": "I see, I see... hmm..."
+    },
+    {
+      "text": "Haan haan, sun rahi hoon...",
+      "gloss_en": "Yes yes, I'm listening..."
+    },
+    {
+      "text": "Ek second beta, chashma dhoond rahi hoon...",
+      "gloss_en": "One second dear, looking for my glasses..."
+    }
+  ],
+  "scammer_lines": {
+    "entity": {
+      "upi": {
+        "text": "UPI ID likhiye: {spoken}.",
+        "gloss_en": "Write down the UPI ID: {value}."
+      },
+      "bank_account": {
+        "text": "Account number likhiye: {spoken}.",
+        "gloss_en": "Write down the account number: {value}."
+      },
+      "ifsc": {
+        "text": "IFSC code bhi likhiye: {spoken}.",
+        "gloss_en": "Also write the IFSC code: {value}."
+      },
+      "phone": {
+        "text": "Mera number likhiye: {spoken}.",
+        "gloss_en": "Write my number: {value}."
+      }
+    },
+    "correction": {
+      "text": "Nahi nahi, galat likha hai. Sahi {target_label} sunyie: {spoken}.",
+      "gloss_en": "No no, that's wrong. Listen to the correct {target_label_en}: {value}."
+    },
+    "affirm": {
+      "text": "Haan haan, bilkul sahi hai.",
+      "gloss_en": "Yes yes, that's exactly right."
+    },
+    "method_failed": {
+      "text": "Theek hai, ye lijiye, ek baar aur likhiye: {spoken}.",
+      "gloss_en": "Okay, here, write it once more: {value}."
+    },
+    "wrap_up": {
+      "text": "Theek hai, par jaldi karna, main phir call karunga.",
+      "gloss_en": "Okay, but be quick, I will call again."
+    },
+    "unknown": {
+      "text": "Aap bas jaise main bol raha hoon waise kijiye.",
+      "gloss_en": "Just do as I am telling you."
+    }
+  },
+  "ptt_cue_cards": {
+    "digital_arrest": [
+      "[Outline] Introduce yourself as an official (tactic: fake authority).",
+      "When asked, read the UPI ID from the card: rathore.demo@kavachtest",
+      "If she reads it back, confirm it."
+    ],
+    "fake_kyc": [
+      "[Outline] Introduce yourself as bank customer care (tactic: fake KYC).",
+      "When asked, read the UPI ID: kycdesk.demo@kavachtest",
+      "Then give the callback number from the card: 9000000003 (synthetic)"
+    ],
+    "fake_investment": [
+      "[Outline] Present a guaranteed-profit group (tactic: fake investment).",
+      "When asked, read the account number from the card: 000000731904",
+      "Then the IFSC: DEMX0000912, then the phone: 9000000007 (synthetic)"
+    ]
+  },
+  "finch_keywords": {
+    "digital_arrest": [
+      "scam",
+      "fraud",
+      "threat model"
+    ],
+    "fake_kyc": [
+      "scam",
+      "privacy",
+      "security"
+    ],
+    "fake_investment": [
+      "pump and dump",
+      "scam",
+      "fraud"
+    ]
+  },
+  "finch_snapshot": [
+    {
+      "name": "onlam",
+      "slug": "onlam_finchip",
+      "category": "Security Audit",
+      "free": true,
+      "summary": "Online scams are becoming more sophisticated every year.",
+      "source": "finch_snapshot",
+      "note": "snapshot 2026-11-23 of live Finch catalogue (query: scam)"
+    },
+    {
+      "name": "velorin",
+      "slug": "velorin_finchip",
+      "category": "Education & Research",
+      "free": true,
+      "summary": "Financial scams target vulnerable individuals through phone calls and online messages.",
+      "source": "finch_snapshot",
+      "note": "snapshot 2026-11-23 of live Finch catalogue (query: scam)"
+    },
+    {
+      "name": "uzi-trap-detector-finchip-new",
+      "slug": "uzi-trap-detector-finchip-new_finchip",
+      "category": "Security Audit",
+      "free": true,
+      "summary": "A pump-and-dump detector for A-share tips: it scans eight",
+      "source": "finch_snapshot",
+      "note": "snapshot 2026-11-23 of live Finch catalogue (query: scam)"
+    }
+  ],
+  "scenarios": {
+    "digital_arrest": {
+      "label": "Digital arrest (fake CBI officer)",
+      "scam_type": "digital_arrest",
+      "scammer_name": "Inspector Rathore (fictional)",
+      "goal_set": [
+        "upi",
+        "bank_account",
+        "ifsc"
+      ],
+      "beats": [
+        {
+          "stage": "hook",
+          "text": "[Outline] Caller claims to be an official and mentions a parcel in the listener's name.",
+          "gloss_en": "[Outline] Caller claims to be an official and mentions a parcel in the listener's name."
+        },
+        {
+          "stage": "authority",
+          "text": "[Outline] Caller asserts an official case and an Aadhaar-linked warrant.",
+          "gloss_en": "[Outline] Caller asserts an official case and an Aadhaar-linked warrant."
+        },
+        {
+          "stage": "urgency",
+          "text": "[Outline] Caller says the matter is urgent and asks the listener to stay on the call.",
+          "gloss_en": "[Outline] Caller says the matter is urgent and asks the listener to stay on the call."
+        },
+        {
+          "stage": "payment_ask",
+          "text": "[Outline] Caller says a deposit is needed and will share UPI and account details.",
+          "gloss_en": "[Outline] Caller says a deposit is needed and will share UPI and account details."
+        }
+      ],
+      "pressure_lines": [
+        {
+          "text": "[Outline] Caller urges a quick response.",
+          "gloss_en": "[Outline] Caller urges a quick response."
+        },
+        {
+          "text": "[Outline] Caller urges a quick response.",
+          "gloss_en": "[Outline] Caller urges a quick response."
+        }
+      ],
+      "entities": {
+        "upi": {
+          "value": "rathore.demo@kavachtest",
+          "spoken": "rathore dot demo at the rate kavachtest"
+        },
+        "bank_account": {
+          "value": "000000482915",
+          "spoken": "triple sifar triple sifar char aath do nau ek paanch",
+          "variant": {
+            "value": "000000482195",
+            "spoken": "triple sifar triple sifar char aath do ek nau paanch"
+          }
+        },
+        "ifsc": {
+          "value": "DEMO0000417",
+          "spoken": "D E M O sifar sifar sifar sifar char ek saat"
+        }
+      },
+      "correction_for": "bank_account",
+      "evasions": {}
+    },
+    "fake_kyc": {
+      "label": "Fake KYC update (bank customer care)",
+      "scam_type": "fake_kyc",
+      "scammer_name": "Demo Bank customer care (fictional)",
+      "goal_set": [
+        "upi",
+        "phone"
+      ],
+      "beats": [
+        {
+          "stage": "hook",
+          "text": "[Outline] Caller claims to be bank customer care and mentions a pending KYC update.",
+          "gloss_en": "[Outline] Caller claims to be bank customer care and mentions a pending KYC update."
+        },
+        {
+          "stage": "authority",
+          "text": "[Outline] Caller cites a rule change and says the account may be blocked.",
+          "gloss_en": "[Outline] Caller cites a rule change and says the account may be blocked."
+        },
+        {
+          "stage": "urgency",
+          "text": "[Outline] Caller says the update must be done right now.",
+          "gloss_en": "[Outline] Caller says the update must be done right now."
+        },
+        {
+          "stage": "payment_ask",
+          "text": "[Outline] Caller asks for a small verification payment and will share UPI ID and number.",
+          "gloss_en": "[Outline] Caller asks for a small verification payment and will share UPI ID and number."
+        }
+      ],
+      "pressure_lines": [
+        {
+          "text": "[Outline] Caller urges a quick response.",
+          "gloss_en": "[Outline] Caller urges a quick response."
+        },
+        {
+          "text": "[Outline] Caller urges a quick response.",
+          "gloss_en": "[Outline] Caller urges a quick response."
+        }
+      ],
+      "entities": {
+        "upi": {
+          "value": "kycdesk.demo@kavachtest",
+          "spoken": "kycdesk dot demo at the rate kavachtest"
+        },
+        "phone": {
+          "value": "9000000003",
+          "spoken": "nau double sifar double sifar double sifar double sifar teen",
+          "variant": {
+            "value": "9000000005",
+            "spoken": "nau double sifar double sifar double sifar double sifar paanch"
+          }
+        }
+      },
+      "correction_for": "phone",
+      "evasions": {
+        "phone": {
+          "text": "[Outline] Caller defers that question and steers back to payment.",
+          "gloss_en": "[Outline] Caller defers that question and steers back to payment."
+        }
+      }
+    },
+    "fake_investment": {
+      "label": "Fake investment group (guaranteed profit)",
+      "scam_type": "fake_investment",
+      "scammer_name": "Aarav, Demo Capital group (fictional)",
+      "goal_set": [
+        "bank_account",
+        "ifsc",
+        "phone"
+      ],
+      "beats": [
+        {
+          "stage": "hook",
+          "text": "[Outline] Caller invites the listener to an investment trading group with guaranteed profit.",
+          "gloss_en": "[Outline] Caller invites the listener to an investment trading group with guaranteed profit."
+        },
+        {
+          "stage": "authority",
+          "text": "[Outline] Caller claims the scheme is registered and others have profited.",
+          "gloss_en": "[Outline] Caller claims the scheme is registered and others have profited."
+        },
+        {
+          "stage": "urgency",
+          "text": "[Outline] Caller says the offer closes today.",
+          "gloss_en": "[Outline] Caller says the offer closes today."
+        },
+        {
+          "stage": "payment_ask",
+          "text": "[Outline] Caller says the first investment goes to the account details they will share.",
+          "gloss_en": "[Outline] Caller says the first investment goes to the account details they will share."
+        }
+      ],
+      "pressure_lines": [
+        {
+          "text": "[Outline] Caller urges a quick response.",
+          "gloss_en": "[Outline] Caller urges a quick response."
+        },
+        {
+          "text": "[Outline] Caller urges a quick response.",
+          "gloss_en": "[Outline] Caller urges a quick response."
+        }
+      ],
+      "entities": {
+        "bank_account": {
+          "value": "000000731904",
+          "spoken": "triple sifar triple sifar saat teen ek nau sifar char",
+          "variant": {
+            "value": "000000731094",
+            "spoken": "triple sifar triple sifar saat teen ek sifar nau char"
+          }
+        },
+        "ifsc": {
+          "value": "DEMX0000912",
+          "spoken": "D E M X sifar sifar sifar sifar nau ek do"
+        },
+        "phone": {
+          "value": "9000000007",
+          "spoken": "nau double sifar double sifar double sifar double sifar saat"
+        }
+      },
+      "correction_for": "bank_account",
+      "evasions": {}
+    }
+  }
+}

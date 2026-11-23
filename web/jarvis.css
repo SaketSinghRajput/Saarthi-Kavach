@@ -1,0 +1,82 @@
+/* Jarvis HUD theme. Applies only while <body class="jv"> (default). ?theme=classic removes the class. */
+@font-face{font-family:"Chakra Petch";font-weight:400;src:url(fonts/ChakraPetch-Regular.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Chakra Petch";font-weight:500;src:url(fonts/ChakraPetch-Medium.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Chakra Petch";font-weight:600;src:url(fonts/ChakraPetch-SemiBold.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Chakra Petch";font-weight:700;src:url(fonts/ChakraPetch-Bold.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"JetBrains Mono";font-weight:400;src:url(fonts/JetBrainsMono-Regular.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"JetBrains Mono";font-weight:700;src:url(fonts/JetBrainsMono-Bold.woff2) format("woff2");font-display:swap}
+
+body:not(.jv) .jv-only{display:none !important}
+body.jv{--bg:#04070d;--p1:#0a1220;--p2:#0f1b2e;--ln:#1e3a52;--tx:#e6f1fa;--mu:#9db2c4;
+--ok:#34d399;--wn:#fbbf24;--rd:#ff5c6c;--bl:#22d3ee;--vi:#b69cff;
+--ui:"Chakra Petch","Segoe UI",system-ui,sans-serif;--mono:"JetBrains Mono",Consolas,monospace;
+font-family:var(--ui)}
+.jv .stage{background:radial-gradient(circle at 1px 1px,rgba(34,211,238,.10) 1px,transparent 1.5px) 0 0/28px 28px,var(--bg)}
+.jv .top{background:var(--p1);border-bottom:1px solid var(--ln)}
+.jv .logo{letter-spacing:2px;text-transform:uppercase;color:var(--bl)}
+.jv .logo small{letter-spacing:.5px;text-transform:none}
+.jv .sel,.jv .btn,.jv .sim,.jv .tag{border-radius:2px}
+.jv .btn{clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);border-radius:0;letter-spacing:1px;text-transform:uppercase}
+.jv .live,.jv .cnt,.jv .kv b{font-family:var(--mono)}
+.jv .sim{border-radius:0}
+
+/* chamfered HUD frames: panel colour = hairline, ::before = inset fill, both clipped */
+.jv .panel{background:var(--ln);border:0;border-radius:0;padding:13px 17px;
+clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px)}
+.jv .panel::before{content:"";position:absolute;inset:1px;background:var(--p1);z-index:0;
+clip-path:polygon(15px 0,100% 0,100% calc(100% - 15px),calc(100% - 15px) 100%,0 100%,0 15px)}
+.jv .panel>*{position:relative;z-index:1}
+.jv .panel h2{color:var(--bl);letter-spacing:2px}
+.jv .panel.glow{animation:jvglow 1.3s ease-out}
+@keyframes jvglow{0%{background:var(--bl)}100%{background:var(--ln)}}
+.jv .num{border-radius:0;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);background:var(--bl)}
+.jv .tag{border-radius:0}
+.jv .ln{border-radius:2px 12px 2px 12px}
+.jv .big .n,.jv .chip .v,.jv .risk,.jv .kv b{font-family:var(--mono)}
+.jv .big .n{font-size:106px;letter-spacing:-2px;text-shadow:0 0 18px rgba(52,211,153,.35)}
+.jv .chip{border-radius:2px;position:relative;overflow:visible}
+.jv .chip .v{font-size:20px}
+.jv .deep{border-radius:0;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px)}
+.jv .doc{border-radius:2px}
+.jv .msg b,.jv .ln em{letter-spacing:1px}
+
+/* orb row */
+.orbrow{display:flex;align-items:center;gap:16px;flex:none;margin-bottom:6px}
+.orbrow canvas{display:block;flex:none}
+.orbwho{font-size:26px;font-weight:700;letter-spacing:2px;color:var(--bl)}
+.orbsub{font-size:18px;color:var(--mu)}
+
+/* risk dial */
+.riskrow{display:flex;gap:14px;align-items:center}
+.rtxt{flex:1;min-width:0}
+.jv .rtxt .bar,.jv .rtxt .mrow{display:none}
+#dial .dtrack{fill:none;stroke:var(--ln);stroke-width:10;stroke-linecap:butt}
+#dial .dval{fill:none;stroke-width:10;stroke-linecap:butt}
+#dial .dval.lo{stroke:var(--ok)}#dial .dval.md{stroke:var(--wn)}#dial .dval.hi{stroke:var(--rd)}
+#dial .dtick{stroke:var(--mu);stroke-width:2}
+#dial .dnum{font:700 34px var(--mono);fill:var(--tx)}
+#dial .dlab{font:600 18px var(--ui);fill:var(--mu);letter-spacing:2px}
+
+/* agent graph */
+#agraph{display:block;flex:none;width:100%;height:98px;margin-bottom:6px}
+#agraph .ge{stroke:var(--ln);stroke-width:2}
+#agraph .ge.hot{stroke:var(--wn);stroke-width:3}
+#agraph .gn polygon{fill:var(--p2);stroke-width:2}
+#agraph .gn text{font:600 18px var(--ui);fill:var(--mu)}
+#agraph .gn.on polygon{fill:#12304a}
+#agraph .gn.on text{fill:#fff}
+
+/* lock-on brackets */
+.lk{position:absolute;inset:3px;pointer-events:none}
+.lk i{position:absolute;width:14px;height:14px;border:0 solid var(--ok)}
+.lk .tl{left:0;top:0;border-left-width:3px;border-top-width:3px}
+.lk .tr{right:0;top:0;border-right-width:3px;border-top-width:3px}
+.lk .bl{left:0;bottom:0;border-left-width:3px;border-bottom-width:3px}
+.lk .br{right:0;bottom:0;border-right-width:3px;border-bottom-width:3px}
+.lk.snap{animation:lksnap .45s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes lksnap{0%{transform:scale(1.35);opacity:0}60%{opacity:1}100%{transform:scale(1);opacity:1}}
+
+@media (prefers-reduced-motion:reduce){
+  .jv .panel.glow,.lk.snap,.jv .live.on i,.jv .live.ring i,.mic.rec,.deep.flag .wave i{animation:none}
+}
+.jv .chip .v{word-break:normal;overflow-wrap:anywhere}
