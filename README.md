@@ -11,7 +11,7 @@ Context (not our result): Indians lost Rs 22,845.7 crore to cyber fraud in 2024 
 | | |
 |---|---|
 | Demo URL | `<DEMO_URL>` (passcode: `<DEMO_PASSCODE>`) |
-| Demo video | `<VIDEO_URL>` (3:42, auto-built from a real live run with real call audio; see `docs/VIDEO.md`) |
+| Demo video | `https://drive.google.com/file/d/1QbWHWrcm4nxQcX4-Y_pVCWxif1bRJY6L/view?usp=sharing` (3:42, auto-built from a real live run with real call audio; see `docs/VIDEO.md`) |
 | Repo | `https://github.com/SaketSinghRajput/Saarthi-Kavach` |
 
 > Fully simulated. No real phone network, no real scammers, no real people or numbers. All data is synthetic.
