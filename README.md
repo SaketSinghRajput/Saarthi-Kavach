@@ -178,7 +178,7 @@ Gate check: `docs/security/gate-check-2026-11-22.md`. Threat model: `docs/securi
 
 ## Team and credits
 
-`<TEAM_NAMES_AND_ROLES>`
+**Team Falcon** — Saket Singh Rajput (founder, lead) and team.
 
 Built with Lyzr, Band, AdaL and Finch; packaged for Agent37 (not deployed there). Kokoro TTS (Apache-2.0). Voice flag by DetectifAI (not a sponsor). Licence: `MIT (see LICENSE)`.
 
