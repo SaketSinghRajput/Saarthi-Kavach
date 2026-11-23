@@ -138,7 +138,7 @@ flowchart TB
     UI2["Transcript + English subtitle line + audio player"]
     UI3["Intel panel: chips missing / suspect / heard / confirmed + IFSC lookup"]
     UI4["Agent room panel: Band mirror with send ticks"]
-    UI5["Drafts + Approve with passcode"]
+    UI5["Drafts + Approve"]
     UI6["HUD: minutes wasted, substantive reply p95, compute p95, risk, voice flag"]
   end
   subgraph SVC["app/ FastAPI service"]
@@ -705,7 +705,7 @@ A planted entity counts as extracted only if it ends the call `verified` with th
 | **C4** | Code-only Verifier. Drafts accept only `status=verified` (model validator). Band carries only `job_id`. Never-from-Band rule. | Cases 2 and 5. Unverified-draft test. Forged-mention test. |
 | **C5** | `textContent` only. CSP `default-src 'self'; script-src 'self'; media-src 'self' blob:`. `.txt` exports. | Case 4. `rg innerHTML web/` returns nothing. |
 | **C6** | Keys only in env. `gitleaks` before each push. **Repo is private.** Terminals hidden when recording. **Keys rotated after the finale (2026-11-28)**, not at submission. | gitleaks clean. Devtools shows no keys. |
-| **C7** | Passcode on start, PTT turn, approve and admin endpoints. `INTERNAL_TOKEN` on `/api/internal/*`. Public read-only SSE. Band room private (**verified in S3**). | `curl` returns 401. Band settings screenshot. |
+| **C7** | ~~Passcode on start, PTT turn, approve and admin endpoints.~~ Superseded 2026-11-24: open demo; cost guarded by HOSTED_SCRIPTED_ONLY + start rate limit. `INTERNAL_TOKEN` on `/api/internal/*`. Public read-only SSE. Band room private (**verified in S3**). | `curl` returns 401. Band settings screenshot. |
 | **C8** | 30 turns, 300 s, one call at a time, start rate limit, kill switch checked every turn. run10 uses `semi`. | Loop test; kill switch test. |
 | **C9** | Append-only `approvals.jsonl` with sha256. Watermark on every draft and export. | Hash test. |
 | **C10** | Catalog synthetic voices only, pinned. **Deviation:** a third-party TTS catalog voice instead of Lyzr stock voices (ADR-001; security review ack). Fictional names. Persistent banner. Scam prompts only in the private repo. **PTT:** a human voice as *input* only, browser STT, no audio stored or sent to us. **Pending team lead waiver** (threat model §5); otherwise a synthetic clip is played into the mic. | Banner visible in the video. Voice IDs in the README. Waiver recorded. |
@@ -787,7 +787,7 @@ saarthi/                 # PRIVATE repo
 | `INPUT_MODE` | `scripted` / `ptt` | ADR-007 |
 | `APP_MODE` | `live` / `semi` | ADR-006 |
 | `PACING_SPEED` | `1.0` | 0 = no waits |
-| `APP_PASSCODE`, `INTERNAL_TOKEN` | secrets | C7 |
+| `HOSTED_SCRIPTED_ONLY`, `INTERNAL_TOKEN` | setting, secret | C7 |
 | `KILL_SWITCH`, `MAX_TURNS`, `MAX_CALL_SECONDS` | `false`, `30`, `300` | C8 |
 | `DEMO_SYNTHETIC_ONLY` | `true` | Planted check |
 | `FIXTURES_PATH`, `DB_PATH`, `AUDIO_CACHE_DIR` | paths | |

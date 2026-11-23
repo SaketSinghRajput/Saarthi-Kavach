@@ -75,7 +75,7 @@ Four of the five mandatory sponsors are live in the product. Agent37 is packaged
 - `deploy/DEPLOY.md`: runbook, cost, unverified API points.
 - `app/integrations/tts.py`: `_synth_kokoro` (:171) serves cached clips when the engine is absent, so the hosted image can play audio.
 
-**Evidence.** Image boots with no env vars and no network (`docker run --network none`). Read endpoints need a passcode (401 without, 200 with `X-Passcode`). Expected cost about $1 for six days (`deploy/DEPLOY.md`, estimate from Agent37 docs prices). Live deploy on Agent37: none (see Status).
+**Evidence.** Image boots with no env vars and no network (`docker run --network none`). The hosted demo is open (no passcode) with `HOSTED_SCRIPTED_ONLY=true`, so visitors cannot spend Lyzr credits. Expected cost about $1 for six days (`deploy/DEPLOY.md`, estimate from Agent37 docs prices). Live deploy on Agent37: none (see Status).
 
 **Fallback.** Hugging Face Docker Space, or run locally with uvicorn.
 

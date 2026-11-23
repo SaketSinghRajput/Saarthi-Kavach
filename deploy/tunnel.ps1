@@ -3,7 +3,7 @@
  Usage:  powershell -ExecutionPolicy Bypass -File deploy\tunnel.ps1 [-Port 8000]
  Downloads cloudflared.exe to tools\bin if missing (retried), then runs it and prints the https URL.
  The URL is random and lives ONLY while this window and the laptop stay on. Testing/backup, not the submission URL.
- Set APP_PASSCODE in .env before starting the app: the tunnel makes it reachable by anyone with the link.
+ Start the app with $env:HOSTED_SCRIPTED_ONLY="true" first: the tunnel makes it reachable by anyone with the link (no passcode).
 #>
 param([int]$Port = 8000)
 $ErrorActionPreference = 'Stop'

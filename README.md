@@ -10,7 +10,7 @@ Context (not our result): Indians lost Rs 22,845.7 crore to cyber fraud in 2024 
 
 | | |
 |---|---|
-| Demo URL | `<DEMO_URL>` (passcode: `<DEMO_PASSCODE>`) |
+| Demo URL | `<DEMO_URL>` (open, no passcode) |
 | Demo video | `https://drive.google.com/file/d/1QbWHWrcm4nxQcX4-Y_pVCWxif1bRJY6L/view?usp=sharing` (3:42, auto-built from a real live run with real call audio; see `docs/VIDEO.md`) |
 | Repo | `https://github.com/SaketSinghRajput/Saarthi-Kavach` |
 
@@ -80,7 +80,7 @@ Open `http://127.0.0.1:8000/dashboard.html`.
 
 - `?mock=1` replays a scripted call in the browser (`&speed=4` to fast-forward, `&autostart=0` to wait for the Call button).
 - `?theme=classic` shows the original dashboard. The default is the Jarvis theme.
-- If `APP_PASSCODE` is unset, a dev passcode prints at server start. Starting a call, approving a draft and the kill switch need it.
+- No passcode: the demo is open. Public hosts set `HOSTED_SCRIPTED_ONLY=true` (automatic on a Hugging Face Space), so the scammer is scripted and visitors cannot spend Lyzr credits.
 
 Checks:
 
@@ -98,7 +98,7 @@ Copy `.env.example` to `.env` and fill in only what you have. A missing key fall
 | Variable(s) | Purpose |
 |---|---|
 | `INPUT_MODE`, `APP_MODE`, `PACING_SPEED` | Run mode (`scripted` or `ptt`; `semi` offline beats or `live`), speed multiplier (`0` = no waits) |
-| `APP_PASSCODE`, `INTERNAL_TOKEN` | Access control |
+| `HOSTED_SCRIPTED_ONLY`, `INTERNAL_TOKEN` | Public-host cost guard (scripted scammer; default on when `SPACE_ID` is set), internal Band→Reporter token |
 | `KILL_SWITCH`, `MAX_TURNS`, `MAX_CALL_SECONDS`, `START_RATE_PER_MIN`, `PTT_IDLE_S` | Cost and loop limits |
 | `LYZR_API_KEY`, `LYZR_USER_ID`, `LYZR_AGENT_*`, `LYZR_TURN_BUDGET_S`, `KAMLA_TIMEOUT_S` | Lyzr |
 | `TTS_PROVIDER`, `TTS_VOICE_KAMLA`, `TTS_VOICE_SCAMMER` | Text to speech (catalog voices only) |
@@ -153,7 +153,7 @@ Safety comes from code, not prompts. A fully prompt-injected model still cannot 
 - **Synthetic identifiers.** Persona and scammer details come from one fixture in obviously fake formats. Phone numbers carry "(synthetic)". Real-looking numbers, PINs and OTPs are redacted from Kamla's replies.
 - **Transcripts are data.** Scammer speech is wrapped as untrusted, capped at 500 characters, rendered as text.
 - **Deterministic Verifier.** Only planted, well-formed values reach a draft. The Band handoff carries a job id only.
-- **Access and cost.** Passcode on writes and reads, rate limit, turn and time caps, kill switch.
+- **Access and cost.** Open demo (no passcode, simulated calls only, drafts never sent). Hosted scripted-only scammer, call-start rate limit, turn and time caps, kill switch.
 - **Egress allow-list.** One HTTP client reaches only sponsor hosts. AdaL runs in an empty temp directory, tools disabled, behind a CONNECT proxy that allows one host.
 - **Real-test data** is redacted public text, runs in Docker `--network none`, is gitignored, and is never used in the demo.
 

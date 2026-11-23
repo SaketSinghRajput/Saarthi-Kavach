@@ -20,3 +20,5 @@ S1 trim deploy PASS_THROUGH; S2 turn off /api/docs and /api/openapi.json when pa
 
 ## Verdict: GO with conditions
 Conditions: (a) deploy only with a strong APP_PASSCODE set and keep INTERNAL_TOKEN/ADAL/DetectifAI vars out of the deployer env; (b) run the mirror exclusion list and `gitleaks dir` on the mirror before the public push and send me the file list for review; (c) rotate the Agent37 and sponsor keys after judging and delete the instance (`--teardown`).
+
+**Update 2026-11-24 (founder decision):** the passcode was removed so judges can open the demo directly. Condition (a) is replaced by `HOSTED_SCRIPTED_ONLY=true` on every public host (auto-on when `SPACE_ID` is set; forced by `agent37_deploy.py`), plus the existing call-start rate limit, one-call-at-a-time, turn/time caps and kill switch. Data is synthetic only and drafts are never sent, so open reads expose no personal data. Residual risk: anyone with the URL can start, end or approve a simulated call.

@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from app.api import create_app
 from tests.conftest import run_call, needs_full_fixture
 
-H = {"X-Passcode": "test-pass"}
+H = {}
 
 EVENT_FIELDS = {
     "call_status": {"call_id", "state", "scenario"},
@@ -62,25 +62,22 @@ def test_all_scenarios_extract_everything_offline(settings, fx):
         assert res["end_reason"] == "all_resolved"
 
 
-def test_api_auth_and_full_call_and_approve(settings):
+def test_api_open_full_call_and_approve(settings):
     with TestClient(create_app(settings)) as c:
         body = {"scenario": "fake_kyc", "input_mode": "scripted"}
-        assert c.post("/api/call/start", json=body).status_code == 401
-        assert c.post("/api/call/start", json=body, headers={"X-Passcode": "wrong"}).status_code == 401
         assert c.post("/api/call/start", json={**body, "scenario": "nope"}, headers=H).status_code == 422
         assert c.post("/api/call/start", json={**body, "x": 1}, headers=H).status_code == 422
         assert c.post("/api/call/start", json=body, headers=H).status_code == 200
         st = wait_for(c, lambda s: len(s["drafts"]) == 2)
         assert st["call"]["state"] == "ended" and len(st["entities"]) >= 2 and st["metrics"]
         d = st["drafts"][0]["draft_id"]
-        assert c.post(f"/api/drafts/{d}/approve", json={}).status_code == 401
         assert c.post("/api/drafts/dr_nonexistent/approve", json={}, headers=H).status_code == 404
         r = c.post(f"/api/drafts/{d}/approve", json={"approver": "tester"}, headers=H)
         assert r.status_code == 200 and r.json()["status"] == "approved"
         assert c.post(f"/api/drafts/{d}/approve", json={}, headers=H).status_code == 409
-        # passcode in the body is also accepted (spec: approve (passcode))
         d2 = st["drafts"][1]["draft_id"]
-        assert c.post(f"/api/drafts/{d2}/approve", json={"passcode": "test-pass"}).status_code == 200
+        assert c.post(f"/api/drafts/{d2}/approve", json={"passcode": "x"}).status_code == 422  # field removed
+        assert c.post(f"/api/drafts/{d2}/approve", json={}).status_code == 200
         st = c.get("/api/state", headers=H).json()
         assert {x["status"] for x in st["drafts"]} == {"approved"}
     lines = (settings and open(f"{settings.data_dir}/approvals.jsonl", encoding="utf-8").read().splitlines())
@@ -109,7 +106,6 @@ def test_kill_switch_ends_call_gracefully(settings):
     with TestClient(create_app(settings)) as c:
         c.post("/api/call/start", json={"scenario": "digital_arrest", "input_mode": "scripted"}, headers=H)
         time.sleep(0.2)
-        assert c.post("/api/kill").status_code == 401
         assert c.post("/api/kill", headers=H).status_code == 200
         st = wait_for(c, lambda s: s["call"] and s["call"]["state"] == "ended" and len(s["drafts"]) == 2, 20)
         assert st["call"]["end_reason"] == "kill_switch"
@@ -127,13 +123,12 @@ def test_env_kill_switch(settings, fx):
     assert res["end_reason"] == "kill_switch" and res["turns"] <= 4
 
 
-def test_ptt_cap_auth_and_flow(settings):
+def test_ptt_cap_and_flow(settings):
     settings.ptt_idle_s = 0.5
     with TestClient(create_app(settings)) as c:
         assert c.post("/api/ptt", json={"text": "hi"}, headers=H).status_code == 409  # no ptt call yet
         c.post("/api/call/start", json={"scenario": "digital_arrest", "input_mode": "ptt"}, headers=H)
         time.sleep(0.1)
-        assert c.post("/api/ptt", json={"text": "hi"}).status_code == 401
         assert c.post("/api/ptt", json={"text": "x" * 501}, headers=H).status_code == 422
         assert c.post("/api/ptt", json={"text": ""}, headers=H).status_code == 422
         assert c.post("/api/ptt", json={"text": "x" * 500}, headers=H).status_code == 200
@@ -265,30 +260,11 @@ def test_pacing_is_a_speed_multiplier(settings, fx):
     assert 0.35 < slow < 0.6 and 0.07 < fast < 0.2 and none < 0.05
 
 
-def test_f7_read_endpoints_need_passcode(settings):
-    with TestClient(create_app(settings)) as c:
-        assert c.get("/api/state").status_code == 401
-        assert c.get("/api/state", headers={"X-Passcode": "wrong"}).status_code == 401
-        assert c.get("/api/state?pc=wrong").status_code == 401
-        assert c.get("/api/events").status_code == 401
-        assert c.get("/api/events?pc=nope").status_code == 401
-        assert c.get("/api/state", headers=H).status_code == 200
-        assert c.get("/api/state?pc=test-pass").status_code == 200
-        with c.stream("GET", "/api/events?since=0&pc=test-pass") as r:
-            assert r.status_code == 200
-        assert c.get("/api/health").status_code == 200
-
-
-def test_f7_open_when_passcode_unset(settings):
-    settings.passcode_is_dev = True
+def test_read_endpoints_open_without_passcode(settings):
     with TestClient(create_app(settings)) as c:
         assert c.get("/api/state").status_code == 200
-
-
-def test_f7_pc_scrubbed_from_access_log():
-    import logging
-    from app.api import _ScrubPc
-    rec = logging.LogRecord("uvicorn.access", 20, "", 0, '%s - "%s %s HTTP/%s" %d',
-                            ("1.2.3.4", "GET", "/api/events?since=1&pc=secret&x=2", "1.1", 200), None)
-    _ScrubPc().filter(rec)
-    assert "secret" not in rec.getMessage() and "pc=***&x=2" in rec.getMessage()
+        with c.stream("GET", "/api/events?since=0") as r:
+            assert r.status_code == 200
+        assert c.get("/api/runs").status_code == 200
+        assert c.get("/api/health").status_code == 200
+        assert c.get("/api/docs").status_code == 404  # hosted mode: no public API docs

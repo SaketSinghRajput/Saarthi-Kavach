@@ -563,17 +563,8 @@
   setInterval(function () { if (S.call.state === 'active') { dirty.call = true; schedule(); } }, 500);
 
   /* ---------- actions ---------- */
-  // Passcode lives in memory only: asked once (or taken from the #pc= URL fragment, which is removed at once), never persisted.
-  var passcode = null;
-  (function () {
-    var m = /[#&]pc=([^&]+)/.exec(location.hash);
-    if (m) { passcode = decodeURIComponent(m[1]); history.replaceState(null, '', location.pathname + location.search); }
-  })();
-  function askPass() { if (!passcode) passcode = window.prompt('Passcode (APP_PASSCODE from the operator; if unset, printed in the server terminal)') || null; return passcode; }
   function post(url, body) {
-    if (!askPass()) return Promise.reject(new Error('no passcode'));
-    return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Passcode': passcode }, body: JSON.stringify(body || {}) })
-      .then(function (r) { if (r.status === 401) passcode = null; return r; });
+    return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
   }
   function note(msg, err) { var m = $('pttMsg'); m.textContent = msg || ''; m.className = 'pmsg' + (err ? ' err' : ''); }
 
@@ -588,7 +579,7 @@
         return r.json().catch(function () { return {}; });
       })
       .then(function (j) { apply('draft', { draft_id: id, status: (j && j.status) || 'approved', approved_at: Date.now() }); done(); })
-      .catch(function () { note('Approval failed (wrong passcode?)', true); done(); });
+      .catch(function () { note('Approval failed', true); done(); });
   }
   function sendPtt() {
     var ta = $('pttText'), t = ta.value.trim().slice(0, PTT_MAX);   // sent raw; the synthetic suffix is added only when displaying
@@ -623,7 +614,7 @@
   function startCall() {
     if (MOCK) { window.SaarthiMock.start(apply, { speed: scale }); return; }
     post('/api/call/start', { scenario: $('scenario').value, input_mode: $('inputMode').value })
-      .then(function (r) { note(r.ok ? '' : r.status === 401 ? 'Wrong passcode' : r.status === 409 ? 'A call is already running' : 'Could not start call: HTTP ' + r.status, !r.ok); })
+      .then(function (r) { note(r.ok ? '' : r.status === 429 ? 'Too many calls started; wait a minute' : r.status === 409 ? 'A call is already running' : 'Could not start call: HTTP ' + r.status, !r.ok); })
       .catch(function () { note('Could not start call', true); });
   }
   function endCall() {
@@ -673,13 +664,11 @@
   function connect(since) {
     var qs = [];
     if (since) qs.push('since=' + encodeURIComponent(since));
-    if (passcode) qs.push('pc=' + encodeURIComponent(passcode));   // in memory only
     var es = new EventSource('/api/events' + (qs.length ? '?' + qs.join('&') : ''));
     es.onopen = function () { connTries = 0; };
     es.onerror = function () {
-      if (es.readyState !== 2 || connTries++ > 2) return;   // CLOSED = rejected (likely 401): ask again
-      passcode = null;
-      if (askPass()) connect(lastEventId || since);
+      if (es.readyState !== 2 || connTries++ > 2) return;   // CLOSED: reconnect a few times
+      setTimeout(function () { connect(lastEventId || since); }, 1000);
     };
     if (since) lastEventId = Number(since) || 0;
     ['call_status', 'turn', 'detector', 'entity', 'goal_state', 'band', 'metrics', 'draft', 'skill', 'policy', 'agent_status', 'call_summary'].forEach(function (t) {
@@ -696,16 +685,13 @@
     var q = new URLSearchParams(location.search);
     if (q.get('autostart') !== '0') setTimeout(startCall, 600);
   } else {
-    var getState = function (retry) {
-      return fetch('/api/state', { headers: passcode ? { 'X-Passcode': passcode } : {} }).then(function (r) {
-        if (r.status === 401 && retry) { passcode = null; if (askPass()) return getState(false); }
-        return r.ok ? r.json() : null;
-      });
+    var getState = function () {
+      return fetch('/api/state').then(function (r) { return r.ok ? r.json() : null; });
     };
     fetch('/api/health').then(function (r) { return r.ok ? r.json() : null; }).then(function (h) {
       if (h && h.mode && h.mode.pacing != null) { S.pacing = h.mode.pacing; dirty.hero = true; schedule(); }
     }).catch(function () { /* optional */ });
-    getState(true).then(function (s) { applySnapshot(s); return s; })
+    getState().then(function (s) { applySnapshot(s); return s; })
       .catch(function () { /* no snapshot available: rely on SSE */ })
       .then(function (s) {
         connect(s && s.last_event_id);

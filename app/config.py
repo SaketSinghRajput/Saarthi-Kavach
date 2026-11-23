@@ -45,16 +45,11 @@ def _default_fixtures() -> str:
     return str(full if full.exists() else ROOT / "fixtures" / "synthetic.sample.json")
 
 
-_DEV_PASSCODE = secrets.token_urlsafe(6)  # ephemeral, per process, only used when APP_PASSCODE unset
-
-
 @dataclass
 class Settings:
     input_mode: str = "scripted"
     app_mode: str = "semi"
     pacing_speed: float = 1.0
-    app_passcode: str = ""
-    passcode_is_dev: bool = False
     internal_token: str = ""
     kill_switch: bool = False
     max_turns: int = 30
@@ -108,7 +103,6 @@ BAND_AGENTS = ("saarthi", "detector", "kamla", "intel", "verifier", "reporter")
 def load_settings() -> Settings:
     _load_dotenv()
     data_dir = _s("DATA_DIR", str(ROOT / "data"))
-    passcode = _s("APP_PASSCODE")
     tok = _s("INTERNAL_TOKEN")
     if tok and len(tok.encode()) < 32:
         raise ValueError("INTERNAL_TOKEN must be at least 32 bytes")
@@ -116,8 +110,6 @@ def load_settings() -> Settings:
         input_mode=_s("INPUT_MODE", "scripted"),
         app_mode=_s("APP_MODE", "semi"),
         pacing_speed=_f("PACING_SPEED", 1.0),
-        app_passcode=passcode or _DEV_PASSCODE,
-        passcode_is_dev=not passcode,
         internal_token=_s("INTERNAL_TOKEN") or secrets.token_hex(32),
         kill_switch=_b("KILL_SWITCH", False),
         max_turns=int(_f("MAX_TURNS", 30)),
@@ -162,6 +154,6 @@ def load_settings() -> Settings:
         egress_allowlist=tuple(h.strip().lower() for h in _s("EGRESS_ALLOWLIST").split(",") if h.strip()),
         start_rate_per_min=int(_f("START_RATE_PER_MIN", 12)),
         ptt_idle_s=_f("PTT_IDLE_S", 60),
-        hosted_scripted_only=_b("HOSTED_SCRIPTED_ONLY", bool(passcode)),  # default on when hosted (real passcode)
+        hosted_scripted_only=_b("HOSTED_SCRIPTED_ONLY", bool(_s("SPACE_ID"))),  # default on when hosted (HF sets SPACE_ID)
     )
     return s

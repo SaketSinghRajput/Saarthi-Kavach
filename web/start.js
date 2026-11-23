@@ -1,4 +1,4 @@
-/* Preserve any #fragment (e.g. passcode) when moving on to the console. */
+/* Preserve any #fragment (e.g. ?mock) when moving on to the console. */
 (function () {
   'use strict';
   if (location.hash) {

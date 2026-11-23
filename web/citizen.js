@@ -1,4 +1,4 @@
-/* Optional enhancement: if a passcode is supplied in the URL fragment (#pc=...), show the scam type when the detector flags one.
+/* Optional enhancement: when a live call is running on this server, show the scam type once the detector flags it.
    The page is fully usable without any server data; nothing here is required. */
 (function () {
   'use strict';
@@ -14,12 +14,9 @@
   var msg = 'सावधान! यह ठगी (फ्रॉड) कॉल हो सकती है। पैसे मत भेजिए, कॉल काटिए, 1930 पर कॉल कीजिए. / Scam alert: do not send money, hang up, call 1930. Police/CBI never arrest anyone over a phone or video call.';
   document.getElementById('share').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
 
-  var m = /[#&]pc=([^&]+)/.exec(location.hash);
-  if (!m || !window.EventSource) return;
-  var pc = decodeURIComponent(m[1]);
-  history.replaceState(null, '', location.pathname + location.search);   // keep passcode in memory only
+  if (!window.EventSource) return;
   var PLAIN = { digital_arrest: "Fake CBI / police 'digital arrest'", fake_kyc: 'Fake bank KYC / bank officer', fake_investment: 'Fake investment / trading tips' };
-  var es = new EventSource('/api/events?pc=' + encodeURIComponent(pc));
+  var es = new EventSource('/api/events');
   es.addEventListener('detector', function (ev) {
     try {
       var d = JSON.parse(ev.data), tp = String(d.scam_type || '');
@@ -28,5 +25,5 @@
       }
     } catch (e) { /* ignore */ }
   });
-  es.onerror = function () { if (es.readyState === 2) es.close(); };   // rejected or gone: stay static
+  es.onerror = function () { if (es.readyState === 2) es.close(); };   // server gone: stay static
 })();

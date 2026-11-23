@@ -11,7 +11,9 @@ for _k in list(os.environ):
         os.environ.pop(_k)
 os.environ["SAARTHI_NO_DOTENV"] = "1"
 os.environ["PACING_SPEED"] = "0"
-os.environ["APP_PASSCODE"] = "test-pass"
+os.environ.pop("APP_PASSCODE", None)
+os.environ.pop("SPACE_ID", None)
+os.environ["HOSTED_SCRIPTED_ONLY"] = "true"  # tests run as the hosted demo: scammer never calls the live LLM
 os.environ["INTERNAL_TOKEN"] = "t" * 40
 
 from app.bus import EventBus  # noqa: E402

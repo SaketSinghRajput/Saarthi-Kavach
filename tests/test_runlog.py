@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from app.api import create_app
 from tests.conftest import run_call
 
-H = {"X-Passcode": "test-pass"}
+H = {}
 spec = importlib.util.spec_from_file_location("runlog_report", Path(__file__).resolve().parent.parent / "tools" / "runlog_report.py")
 rr = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(rr)
@@ -71,11 +71,9 @@ def test_answer_p95_is_p95_of_sum_not_sum_of_p95s():
     assert rr.p95(list(range(1, 21))) == 19  # nearest rank
 
 
-def test_api_runs_gated_and_served(settings, fx):
+def test_api_runs_served(settings, fx):
     res, p, run = _run(settings, fx)
     with TestClient(create_app(settings)) as c:
-        assert c.get("/api/runs").status_code == 401
-        assert c.get(f"/api/runs/{res['call_id']}").status_code == 401
         lst = c.get("/api/runs", headers=H).json()["runs"]
         assert lst == [{"run_id": res["call_id"], "scenario": "digital_arrest", "dead_air_p95_ms": res["dead_air_p95_ms"]}]
         assert c.get(f"/api/runs/{res['call_id']}", headers=H).json() == run

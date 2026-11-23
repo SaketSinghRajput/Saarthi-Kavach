@@ -126,7 +126,7 @@ def test_agent_status_stub_by_default(settings, fx):
     assert a["kamla"] == {"platform": "Lyzr", "mode": "stub"}
     assert a["reporter"]["platform"] == "AdaL" and a["room"]["platform"] == "Band"
     assert a["host"] == {"platform": "local", "mode": "stub"}
-    assert a["scammer"]["mode"] == "scripted"  # tests run with a real passcode, so the hosted guard is on
+    assert a["scammer"]["mode"] == "scripted"  # tests run with HOSTED_SCRIPTED_ONLY=true
     assert all(v["mode"] in ("live", "stub", "scripted") for v in a.values())
     assert a["scout"]["mode"] == "stub"  # snapshot, not live
 
@@ -153,7 +153,7 @@ def test_agent_status_modes_follow_settings(settings, fx):
 
 def test_api_state_exposes_agent_status(settings, fx):
     with TestClient(create_app(settings)) as c:
-        st = c.get("/api/state", headers={"X-Passcode": "test-pass"}).json()
+        st = c.get("/api/state").json()
     assert set(st["agent_status"]["agents"]) == {"kamla", "scammer", "reporter", "scout", "room", "host"}
 
 

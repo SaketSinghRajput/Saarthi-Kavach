@@ -5,7 +5,7 @@
     py -3.12 deploy/hf_space_push.py --with-lyzr   # also pass Lyzr keys (spends Lyzr credits per call)
 
 Env / .env (read at runtime, never printed): HF_TOKEN, optional HF_SPACE (default "<user>/saarthi-kavach"),
-optional APP_PASSCODE (generated and printed ONCE if absent). The staging dir is built from the PUBLIC mirror
+no passcode (open demo; HOSTED_SCRIPTED_ONLY keeps the scammer off the live LLM). The staging dir is built from the PUBLIC mirror
 (D:\\hacthon\\saarthi-public, rebuilt first by tools/make_public_mirror.py), never from the private repo.
 No sponsor keys are sent by default: the Space runs the scripted scammer + mock replay with no keys at all.
 huggingface_hub is installed into a scratch venv via uv when missing (requirements.txt is untouched).
@@ -15,7 +15,6 @@ from __future__ import annotations
 import argparse
 import os
 import re
-import secrets
 import shutil
 import subprocess
 import sys
@@ -165,7 +164,7 @@ def ensure_hub(install: bool):
     raise SystemExit("huggingface_hub still not importable in scratch venv")
 
 
-def push(a, env: dict, files: list[str], passcode: str, generated: bool) -> None:
+def push(a, env: dict, files: list[str]) -> None:
     hub = ensure_hub(install=True)
     token = env.get("HF_TOKEN")
     api = hub.HfApi(token=token)
@@ -185,7 +184,7 @@ def push(a, env: dict, files: list[str], passcode: str, generated: bool) -> None
     space = env.get("HF_SPACE") or f"{user}/{DEFAULT_NAME}"
     step("create Space", lambda: api.create_repo(space, repo_type="space", space_sdk="docker", exist_ok=True, private=False))
     step("set variables", lambda: [api.add_space_variable(space, k, v) for k, v in VARIABLES.items()])
-    secrets_ = {"APP_PASSCODE": passcode}
+    secrets_ = {}
     if a.with_lyzr:
         secrets_.update({k: env[k] for k in LYZR_KEYS if env.get(k)})
     step("set secrets", lambda: [api.add_space_secret(space, k, v) for k, v in secrets_.items()])
@@ -194,10 +193,6 @@ def push(a, env: dict, files: list[str], passcode: str, generated: bool) -> None
     slug = space.replace("/", "-").replace("_", "-").lower()
     print(f"\nPushed {len(files)} files to https://huggingface.co/spaces/{space} (build starts now; watch the Logs tab)")
     print(f"PUBLIC DEMO URL: https://{slug}.hf.space")
-    if generated:
-        print(f"APP_PASSCODE (shown ONCE, save it now): {passcode}")
-    else:
-        print("APP_PASSCODE: taken from your env/.env (unchanged)")
 
 
 def main(argv=None) -> int:
@@ -227,19 +222,13 @@ def main(argv=None) -> int:
     print(f"step 2: staging {a.staging}: {len(files)} files; static validation: " + ("OK" if not problems else "FAILED"))
     if problems:
         raise SystemExit("\n".join("  - " + p for p in problems))
-    passcode = env.get("APP_PASSCODE") or ""
-    generated = not passcode
-    if generated:
-        passcode = secrets.token_urlsafe(12)
-    if len(passcode) < 12:
-        raise SystemExit("APP_PASSCODE must be 12+ characters")
     if a.dry_run:
         have_hub = ensure_hub(install=False) is not None
         print("\nDRY RUN plan (nothing sent):")
         print(f"  Space:      {env.get('HF_SPACE') or '<user>/' + DEFAULT_NAME} (docker, public)")
         print(f"  HF_TOKEN:   {'set (hidden)' if env.get('HF_TOKEN') else 'NOT SET'}")
         print(f"  variables:  {VARIABLES}")
-        sec = {"APP_PASSCODE": "***" + (" (generated at run time, shown once)" if generated else " (from env)")}
+        sec = {}
         if a.with_lyzr:
             sec.update({k: "***" for k in LYZR_KEYS if env.get(k)})
         print(f"  secrets:    {sec}")
@@ -247,7 +236,7 @@ def main(argv=None) -> int:
         print(f"  huggingface_hub: {'installed' if have_hub else 'will be installed into ' + str(HUB_VENV) + ' via uv'}")
         print("  upload:     " + ", ".join(files[:6]) + f", ... ({len(files)} files)")
         return 0
-    push(a, env, files, passcode, generated)
+    push(a, env, files)
     return 0
 
 

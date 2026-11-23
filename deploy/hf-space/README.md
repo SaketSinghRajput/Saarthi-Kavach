@@ -53,14 +53,14 @@ The mirror (`D:\hacthon\saarthi-public`, built by an internal document (not ship
    ```
    Then handle the audio trap above. Commit and `git push` to the Space (this is the HF push, not the GitHub push; it needs your HF login or token).
 4. **Settings > Variables and secrets.**
-   - Secret `APP_PASSCODE`: 12+ characters. Required: without it the app leaves read endpoints open.
+   - Variable `HOSTED_SCRIPTED_ONLY` = `true` (also automatic on a Space, which sets `SPACE_ID`). No passcode: the demo is open.
    - Variable `PORT` = `7860`.
    - Nothing else for the default demo. Do **not** set `INPUT_MODE=ptt`, Lyzr keys or Band keys unless you want live behaviour.
 5. **Wait for the build** (Logs tab). Then verify:
    - `GET https://<user>-saarthi-kavach.hf.space/api/health` returns 200.
-   - `GET .../api/state` returns 401 without the passcode and 200 with header `X-Passcode: <APP_PASSCODE>`.
+   - `GET .../api/state` returns 200 (open demo).
    - Open `/dashboard.html` and run one scripted call.
-6. **Put the URL and passcode** into the README top table and the submission form (before 2026-11-24 19:00 IST).
+6. **Put the URL** into the README top table and the submission form (before 2026-11-24 19:00 IST).
 7. **After judging:** pause or delete the Space.
 
 ## Optional: live Kamla (costs money)

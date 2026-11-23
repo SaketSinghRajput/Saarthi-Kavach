@@ -139,10 +139,8 @@ class StartBody(BaseModel):
     model_config = {"extra": "forbid"}
     scenario: Literal["digital_arrest", "fake_kyc", "fake_investment"] = "digital_arrest"
     input_mode: Literal["scripted", "ptt"] = "scripted"
-    passcode: Optional[str] = Field(default=None, max_length=128)
 
 
 class ApproveBody(BaseModel):
     model_config = {"extra": "forbid"}
-    passcode: Optional[str] = Field(default=None, max_length=128)
     approver: str = Field(default="human", max_length=40)

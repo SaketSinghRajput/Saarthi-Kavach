@@ -11,7 +11,7 @@ for (const t of types) {
 document.getElementById("start").addEventListener("click", async () => {
   const r = await fetch("/api/call/start", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-Passcode": document.getElementById("passcode").value },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ scenario: document.getElementById("scenario").value, input_mode: "scripted" }),
   });
   log.textContent += "start -> " + r.status + "\n";

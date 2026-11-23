@@ -5,7 +5,7 @@
   py -3.12 deploy/agent37_deploy.py               # build template, create instance, open port, poll health
   py -3.12 deploy/agent37_deploy.py --teardown    # delete instance (+ --delete-template to drop the template)
 
-Reads AGENT37_API_KEY, APP_PASSCODE and optional pass-through vars from the process env; .env is loaded
+Reads AGENT37_API_KEY and optional pass-through vars from the process env; .env is loaded
 (python-dotenv if installed, else a tiny parser) only here, at runtime, and never printed.
 Raw REST flow from https://www.agent37.com/docs/llms-full.txt (template-builds -> upload -> start -> poll).
 """
@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 STATE = ROOT / "deploy" / ".agent37_state.json"   # instance id only, no secrets; gitignored
 DEFAULT_PORT = 8000
 # App settings that make the demo live. Unset ones are skipped (the app falls back to offline stubs).
-PASS_THROUGH = ["APP_PASSCODE", "APP_MODE", "INPUT_MODE", "PACING_SPEED", "DEMO_SYNTHETIC_ONLY",
+PASS_THROUGH = ["APP_MODE", "INPUT_MODE", "PACING_SPEED", "DEMO_SYNTHETIC_ONLY",
                 "KILL_SWITCH", "MAX_TURNS", "MAX_CALL_SECONDS", "START_RATE_PER_MIN", "PTT_IDLE_S",
                 "LYZR_API_KEY", "LYZR_USER_ID", "LYZR_CHAT_URL", "LYZR_AGENT_SCAMMER", "LYZR_AGENT_KAMLA",
                 "LYZR_AGENT_INTEL", "KAMLA_TIMEOUT_S", "SCAMMER_TIMEOUT_S", "LYZR_TURN_BUDGET_S",
@@ -120,8 +120,7 @@ def dry_run(args, env: dict, key: str, names: list) -> None:
         if b is not None:
             print("     body:", b if isinstance(b, str) else json.dumps(b))
     print("env passed through:", sorted(env) or "none", "| not set (skipped):", sorted(set(names) - set(env)))
-    if "APP_PASSCODE" not in env:
-        print("WARNING: APP_PASSCODE unset; a real run refuses (public read endpoints would be open).")
+    print("HOSTED_SCRIPTED_ONLY=true is always set: the scammer never calls the live LLM on a public host.")
 
 
 def deploy(args, env: dict, key: str) -> None:
@@ -181,8 +180,7 @@ def deploy(args, env: dict, key: str) -> None:
         for _ in range(60):
             try:
                 if httpx.get(f"{url}/api/health", timeout=10).status_code == 200:
-                    print(f"[5/5] healthy.\nPUBLIC DEMO URL: {url}\n"
-                          "Dashboard read endpoints require your APP_PASSCODE.")
+                    print(f"[5/5] healthy.\nPUBLIC DEMO URL: {url}")
                     return
             except httpx.HTTPError:
                 pass
@@ -217,6 +215,7 @@ def main() -> None:
     load_env()
     names = [n.strip() for n in args.env_names.split(",") if n.strip()]
     env = {n: os.environ[n] for n in names if os.environ.get(n)}
+    env["HOSTED_SCRIPTED_ONLY"] = "true"  # public host: never let visitors spend Lyzr credits
     key = os.environ.get("AGENT37_API_KEY", "")
     if args.dry_run:
         return dry_run(args, env, key, names)
@@ -224,8 +223,6 @@ def main() -> None:
         sys.exit("AGENT37_API_KEY missing (put it in .env or the process environment)")
     if args.teardown:
         return teardown(args, key)
-    if "APP_PASSCODE" not in env:
-        sys.exit("APP_PASSCODE missing: refusing to publish a dashboard whose read endpoints are open")
     deploy(args, env, key)
 
 

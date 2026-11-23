@@ -95,15 +95,14 @@ def test_trim_sentences_never_mid_sentence():
 
 # ---- hosted scripted-only ------------------------------------------------------
 def test_hosted_scripted_only_defaults(monkeypatch):
-    monkeypatch.setenv("APP_PASSCODE", "real-pass")
     monkeypatch.delenv("HOSTED_SCRIPTED_ONLY", raising=False)
+    monkeypatch.setenv("SPACE_ID", "someone/saarthi-kavach")  # Hugging Face Space
     assert load_settings().hosted_scripted_only is True
     monkeypatch.setenv("HOSTED_SCRIPTED_ONLY", "false")
     assert load_settings().hosted_scripted_only is False
-    monkeypatch.delenv("APP_PASSCODE")
+    monkeypatch.delenv("SPACE_ID")
     monkeypatch.delenv("HOSTED_SCRIPTED_ONLY")
-    s = load_settings()
-    assert s.passcode_is_dev and s.hosted_scripted_only is False
+    assert load_settings().hosted_scripted_only is False  # local laptop: live Lyzr allowed
 
 
 def test_hosted_scripted_only_blocks_live_scammer(settings, fx, monkeypatch):

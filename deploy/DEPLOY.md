@@ -5,21 +5,21 @@ Agent37 is the mandatory hosting sponsor. Everything below is one command once t
 ## 5-step runbook (Saket)
 
 1. **Create the Agent37 account** at https://www.agent37.com and claim the free $5 credit (a card is required; it is not charged until you top up). Create an API key (`sk_live_...`).
-2. **Put the key in `.env`** (never commit it): `AGENT37_API_KEY=sk_live_...`. Also make sure `.env` has `APP_PASSCODE=<a real passcode, 12+ chars>`. The script refuses to deploy without it (see Passcode below). Any other app settings already in `.env` (Lyzr, TTS, Band...) are passed through by name.
+2. **Put the key in `.env`** (never commit it): `AGENT37_API_KEY=sk_live_...`. The script always sets `HOSTED_SCRIPTED_ONLY=true` (see Open access below). Any other app settings already in `.env` (Lyzr, TTS, Band...) are passed through by name.
 3. **Preview, then deploy.**
    `py -3.12 deploy/agent37_deploy.py --dry-run` prints the planned API calls with secrets redacted and makes no network calls.
    `py -3.12 deploy/agent37_deploy.py` builds the template in Agent37's cloud (no local Docker needed), creates the instance, opens port 8000 publicly, polls `/api/health`, and prints `PUBLIC DEMO URL: https://<id>-...agent37.app`.
-4. **Verify.** Open the URL (dashboard loads), `GET <url>/api/health` returns 200, `GET <url>/api/state` returns 401 without the passcode and 200 with `X-Passcode: <APP_PASSCODE>`. Run one scripted call end to end. Put the URL in the submission form before 2026-11-24 19:00 IST.
+4. **Verify.** Open the URL (dashboard loads), `GET <url>/api/health` returns 200, `GET <url>/api/state` returns 200 (open demo). Run one scripted call end to end. Put the URL in the submission form before 2026-11-24 19:00 IST.
 5. **Teardown after judging:** `py -3.12 deploy/agent37_deploy.py --teardown --delete-template` (reads the instance id saved in `deploy/.agent37_state.json`, or pass `--instance-id <id>`). Billing is per minute, so deleting stops cost; the disk is wiped on delete.
 
-## Passcode on reads
+## Open access (no passcode)
 
-`app/api.py` gates read endpoints (`/api/state`, SSE) with `APP_PASSCODE` via the `X-Passcode` header or `?pc=`. If `APP_PASSCODE` is unset the app uses an ephemeral dev passcode and **leaves reads open** (verified locally: `/api/state` 200 with no env; 401 with `APP_PASSCODE` set). Because the Agent37 URL is public, `agent37_deploy.py` exits if `APP_PASSCODE` is missing. Write endpoints (start, ptt, kill, approve) always need the passcode. The static dashboard page and `/audio/*` clips are served without a passcode by design (synthetic content only; `DEMO_SYNTHETIC_ONLY` defaults to true). Give judges the passcode in the submission notes.
+The demo is open: no passcode on reads or writes (decision 2026-11-24, so judges can click straight in). What keeps a public URL safe: `HOSTED_SCRIPTED_ONLY=true` (the scammer is scripted, never the live LLM), `START_RATE_PER_MIN` (default 12), one call at a time, turn/time caps, synthetic data only (`DEMO_SYNTHETIC_ONLY`), and drafts that are never sent. `INTERNAL_TOKEN` still guards `/api/internal/*`.
 
 ## Image notes
 
 - `Dockerfile` is `python:3.12-slim`, linux/amd64, non-root uid 10001, 322 MB. Runtime deps only (`deploy/requirements-runtime.txt`: fastapi, uvicorn, pydantic, httpx). No Kokoro/torch.
-- It boots with **no env vars at all** (offline/stub mode, dev passcode). Verified with `docker run --network none`.
+- It boots with **no env vars at all** (offline/stub mode). Verified with `docker run --network none`.
 - App code lives in `/opt/saarthi` because Agent37 mounts the instance disk over the image user's home. The SQLite DB is at `/opt/saarthi/data` (writable; persists across restart, wiped on delete).
 - `prompts/` is not copied: nothing in `app/` reads it at runtime.
 - **Pre-rendered audio caveat:** the 112 cached `.wav` files are served at `/audio/<hash>.wav` as static files, but `TTS` with `TTS_PROVIDER=kokoro` returns the stub (no `audio_url`) whenever the Kokoro package/model is absent, even if the cached file exists (`app/integrations/tts.py`, `_synth_kokoro`). So the hosted demo plays no audio unless that function checks the cache before the `engine is None` early return (owner: app/integrations engineer), or you use `TTS_PROVIDER=elevenlabs` (spends money; needs approval).
